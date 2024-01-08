@@ -63,7 +63,7 @@ module "blog-alb" {
       port        = 80
     }
   }
-  ]
+}
 
    listeners = {
     ex-tcp = {
