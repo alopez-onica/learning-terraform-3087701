@@ -49,21 +49,15 @@ resource "aws_instance" "blog" {
 module "blog-alb" {
   source = "terraform-aws-modules/alb/aws"
 
-  name            = "my-alb"
-  vpc_id          = module.blog_vpc.vpc_id
-  subnets         = module.blog_vpc.public_subnets
-  security_groups = [module.blog_sg.security_group_id]
+  name            = "blob-alb"
 
- listeners = [
-  {
-    port               =80
-    protocol           = "HTTP"
-    target_group_index = 0
-  }
- ]
+  load_balancer_type = "application"
+  vpc_id             = module.blog_vpc.vpc_id
+  subnets            = module.blog_vpc.public_subnets
+  security_groups    = [module.blog_sg.security_group_id]
 
-  target_groups = {
-    ex-instance = {
+  target_groups = [
+    {
       name_prefix      = "blog-"
       protocol         = "HTTP"
       port             = 80
@@ -75,11 +69,18 @@ module "blog-alb" {
         }
       }
     }
+  ]
+
+  http_tcp_listeners = [
+  {
+    port               = 80
+    protocol           = "HTTP"
+    target_group_index = 0
   }
+ ]
 
   tags = {
     Environment = "dev"
-    Project     = "Example"
   }
 }
 
